@@ -9,13 +9,15 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser;
 import java.io.File;
 import javafx.scene.text.Text;
+import java.io.PrintWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 /**
  * Template JavaFX application.
  */
@@ -55,11 +57,12 @@ public class App extends Application{
         Button addTasksBtn = new Button("Add");
         Button clearTasksBtn = new Button("Clear Tasks");
         Button fileBtn = new Button("Import list from file");
+        Button saveBtn = new Button("Save list to file");
 
 
         // organize compents
         introBox.getChildren().addAll(welcome, label, addTasks, addTasksBtn);
-        buttonBox.getChildren().addAll(clearTasksBtn, fileBtn);
+        buttonBox.getChildren().addAll(clearTasksBtn, fileBtn, saveBtn);
         contentBox.getChildren().addAll();
         presetTunesBox.getChildren().addAll(introBox, contentBox, buttonBox);
 
@@ -67,6 +70,7 @@ public class App extends Application{
         addTasksBtn.setOnAction(event -> task());
         clearTasksBtn.setOnAction(event -> clear());
         fileBtn.setOnAction(event -> importFile());
+        saveBtn.setOnAction(event -> saveFile());
 
         // set scene and display stage
         Scene scene = new Scene(presetTunesBox, 400, 300);
@@ -115,6 +119,20 @@ public class App extends Application{
                 }
             }
         } catch (FileNotFoundException e) {
+            return;
+        }
+    }
+    void saveFile() {
+        File file = new File("list.txt");
+        // a fileWriter is almost the same as a printWriter but instead of replacing the file it adds to it
+        try (FileWriter writer = new FileWriter(file, true)) {
+            for (javafx.scene.Node node : contentBox.getChildren()) {
+                if (node instanceof HBox toDo) {
+                    Label label = (Label) toDo.getChildren().get(1);
+                    writer.write(label.getText().trim() + System.lineSeparator());
+                }
+            }
+        } catch (IOException e) {
             return;
         }
     }
