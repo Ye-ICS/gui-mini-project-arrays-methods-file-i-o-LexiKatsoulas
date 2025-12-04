@@ -1,4 +1,5 @@
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Scanner;
 import javafx.application.Application;
 import javafx.geometry.Pos;
@@ -15,6 +16,8 @@ import javafx.stage.Stage;
 import javafx.stage.FileChooser;
 import java.io.File;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
+
 import java.io.PrintWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -24,8 +27,10 @@ import java.io.IOException;
 public class App extends Application{
     VBox contentBox;
     HBox buttonBox;
-    TextField addTasks;
+    TextField tasksTextBox;
     Text fileText;
+    ArrayList<String> numTasks = new ArrayList<>();
+    Text numTasksText;
     public static void main(String[] args) {
         launch(args);
     }
@@ -33,8 +38,9 @@ public class App extends Application{
     @Override
     public void start(Stage stage) {
         // Create components to add.
-        VBox presetTunesBox = new VBox();
-        presetTunesBox.setStyle("-fx-border-color: black; -fx-border-width: 2");
+        VBox presetBox = new VBox();
+        presetBox.setStyle("-fx-border-color: black; -fx-border-width: 2");
+        presetBox.setAlignment(Pos.TOP_CENTER);
         
         VBox introBox = new VBox();
         introBox.setAlignment(Pos.TOP_CENTER);
@@ -51,37 +57,42 @@ public class App extends Application{
         Label label = new Label();
         label.setText("Please enter your tasks: ");
 
-        addTasks = new TextField();
-        addTasks.setPromptText("type here");
-        addTasks.setMaxWidth(250);
+        tasksTextBox = new TextField();
+        tasksTextBox.setPromptText("type here");
+        tasksTextBox.setMaxWidth(250);
         Button addTasksBtn = new Button("Add");
         Button clearTasksBtn = new Button("Clear Tasks");
         Button fileBtn = new Button("Import list from file");
         Button saveBtn = new Button("Save list to file");
+        numTasksText = new Text();
 
 
         // organize compents
-        introBox.getChildren().addAll(welcome, label, addTasks, addTasksBtn);
+        introBox.getChildren().addAll(welcome, label, tasksTextBox, addTasksBtn);
         buttonBox.getChildren().addAll(clearTasksBtn, fileBtn, saveBtn);
         contentBox.getChildren().addAll();
-        presetTunesBox.getChildren().addAll(introBox, contentBox, buttonBox);
+        presetBox.getChildren().addAll(introBox, contentBox, buttonBox, numTasksText);
 
         // Reactions 
-        addTasksBtn.setOnAction(event -> task());
+        addTasksBtn.setOnAction(event -> addTask());
+        tasksTextBox.setOnAction(event -> addTask());
         clearTasksBtn.setOnAction(event -> clear());
         fileBtn.setOnAction(event -> importFile());
         saveBtn.setOnAction(event -> saveFile());
 
         // set scene and display stage
-        Scene scene = new Scene(presetTunesBox, 400, 300);
+        Scene scene = new Scene(presetBox, 400, 300);
         stage.setScene(scene);
         stage.show();
 
     }
     // Method for adding tasks
-    void task() {
-        String text = addTasks.getText();
-        addTasks.clear();
+    void addTask() {
+        String text = tasksTextBox.getText();
+        tasksTextBox.clear();
+        numTasks.add(text);
+        // updating number of tasks
+        numTasksText.setText(numTasks.size() + " task(s) left");
         CheckBox checkBox = new CheckBox();
         HBox toDo = new HBox();
         Label toDoItem = new Label(" " + text);
@@ -123,17 +134,16 @@ public class App extends Application{
         }
     }
     void saveFile() {
-        File file = new File("list.txt");
-        // a fileWriter is almost the same as a printWriter but instead of replacing the file it adds to it
-        try (FileWriter writer = new FileWriter(file, true)) {
-            for (javafx.scene.Node node : contentBox.getChildren()) {
-                if (node instanceof HBox toDo) {
-                    Label label = (Label) toDo.getChildren().get(1);
-                    writer.write(label.getText().trim() + System.lineSeparator());
-                }
+        try {
+            PrintWriter fileWriter = new PrintWriter(new FileWriter("list.txt", false));
+            for (int i = 0; i < numTasks.size(); i++) {
+                fileWriter.println(numTasks.get(i));
             }
-        } catch (IOException e) {
+
+            fileWriter.close();
+        } catch (Exception e) {
             return;
         }
+    
     }
 }
