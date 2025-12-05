@@ -7,20 +7,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import javafx.stage.FileChooser;
 import java.io.File;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
-
 import java.io.PrintWriter;
 import java.io.FileWriter;
-import java.io.IOException;
 /**
  * Template JavaFX application.
  */
@@ -93,28 +87,40 @@ public class App extends Application{
         numTasks.add(text);
         // updating number of tasks
         numTasksText.setText(numTasks.size() + " task(s) left");
+        // making to do lay out
         CheckBox checkBox = new CheckBox();
         HBox toDo = new HBox();
         Label toDoItem = new Label(" " + text);
         toDoItem.setStyle("-fx-font-size: 13");
         checkBox.setMaxSize(12, 13);
 
+        // When checkbox is clicked
         checkBox.setOnAction(checkboxEvent -> {
             toDo.setDisable(true);
+            // remove from array list
+            numTasks.remove(text);
+            numTasksText.setText(numTasks.size() + " task(s) left");
         });
         toDo.getChildren().addAll(checkBox, toDoItem);
         contentBox.getChildren().add(toDo);
     }
     void clear() {
         contentBox.getChildren().clear();
+        // clears arraylist
+        numTasks.clear();
+        numTasksText.setText(numTasks.size() + " task(s) left");
     }
     void importFile() {
         File file = new File("list.txt");
         try (Scanner scanner = new Scanner(file)) {
+            // 'repeat' until scanner doesn't have a next line
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine().trim();
                 if (!line.isEmpty()) {
+                    // Add to numTasks so it gets saved to file as well
+                    numTasks.add(line);
 
+                    // same code for adding a task lay out
                     CheckBox checkBox = new CheckBox();
                     HBox toDo = new HBox();
                     Label toDoItem = new Label(" " + line);
@@ -123,12 +129,16 @@ public class App extends Application{
 
                     checkBox.setOnAction(checkboxEvent -> {
                         toDo.setDisable(true);
+                        numTasks.remove(line);
+                        numTasksText.setText(numTasks.size() + " task(s) left");
                     });
 
                     toDo.getChildren().addAll(checkBox, toDoItem);
                     contentBox.getChildren().add(toDo);
                 }
             }
+        // update number of tasks after import
+        numTasksText.setText(numTasks.size() + " task(s) left");
         } catch (FileNotFoundException e) {
             return;
         }
@@ -136,6 +146,7 @@ public class App extends Application{
     void saveFile() {
         try {
             PrintWriter fileWriter = new PrintWriter(new FileWriter("list.txt", false));
+            // repeat for the number of tasks added
             for (int i = 0; i < numTasks.size(); i++) {
                 fileWriter.println(numTasks.get(i));
             }
