@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
@@ -25,6 +26,8 @@ public class App extends Application{
     Text fileText;
     ArrayList<String> numTasks = new ArrayList<>();
     Text numTasksText;
+    ToggleButton priorityBtn;
+    Label toDoItem;
     public static void main(String[] args) {
         launch(args);
     }
@@ -43,7 +46,6 @@ public class App extends Application{
         contentBox = new VBox();
         buttonBox = new HBox();
         buttonBox.setAlignment(Pos.CENTER);
-        
 
         Label welcome = new Label();
         welcome.setText("Welcome to the To-Do List!");
@@ -54,21 +56,19 @@ public class App extends Application{
         tasksTextBox = new TextField();
         tasksTextBox.setPromptText("type here");
         tasksTextBox.setMaxWidth(250);
-        Button addTasksBtn = new Button("Add");
         Button clearTasksBtn = new Button("Clear Tasks");
         Button fileBtn = new Button("Import list from file");
         Button saveBtn = new Button("Save list to file");
         numTasksText = new Text();
-
+        priorityBtn = new ToggleButton("High Priority");
 
         // organize compents
-        introBox.getChildren().addAll(welcome, label, tasksTextBox, addTasksBtn);
+        introBox.getChildren().addAll(welcome, label, tasksTextBox, priorityBtn);
         buttonBox.getChildren().addAll(clearTasksBtn, fileBtn, saveBtn);
         contentBox.getChildren().addAll();
         presetBox.getChildren().addAll(introBox, contentBox, buttonBox, numTasksText);
 
         // Reactions 
-        addTasksBtn.setOnAction(event -> addTask());
         tasksTextBox.setOnAction(event -> addTask());
         clearTasksBtn.setOnAction(event -> clear());
         fileBtn.setOnAction(event -> importFile());
@@ -81,16 +81,25 @@ public class App extends Application{
 
     }
     // Method for adding tasks
+    // adding/assembling tasks 
     void addTask() {
-        String text = tasksTextBox.getText();
+        String input = tasksTextBox.getText();
         tasksTextBox.clear();
-        numTasks.add(text);
+        String taskText;
+        // If priority add *
+        if (priorityBtn.isSelected()) {
+            taskText = input + " *";
+        } else {
+            taskText = input;
+        }
+        numTasks.add(taskText);
         // updating number of tasks
         numTasksText.setText(numTasks.size() + " task(s) left");
         // making to do lay out
         CheckBox checkBox = new CheckBox();
         HBox toDo = new HBox();
-        Label toDoItem = new Label(" " + text);
+        
+        toDoItem = new Label(" " + taskText);
         toDoItem.setStyle("-fx-font-size: 13");
         checkBox.setMaxSize(12, 13);
 
@@ -98,18 +107,20 @@ public class App extends Application{
         checkBox.setOnAction(checkboxEvent -> {
             toDo.setDisable(true);
             // remove from array list
-            numTasks.remove(text);
+            numTasks.remove(taskText);
             numTasksText.setText(numTasks.size() + " task(s) left");
         });
         toDo.getChildren().addAll(checkBox, toDoItem);
         contentBox.getChildren().add(toDo);
     }
+    // clearing all tasks
     void clear() {
         contentBox.getChildren().clear();
         // clears arraylist
         numTasks.clear();
         numTasksText.setText(numTasks.size() + " task(s) left");
     }
+    // importing tasks from file ("list.txt")
     void importFile() {
         File file = new File("list.txt");
         try (Scanner scanner = new Scanner(file)) {
@@ -119,11 +130,10 @@ public class App extends Application{
                 if (!line.isEmpty()) {
                     // Add to numTasks so it gets saved to file as well
                     numTasks.add(line);
-
+                    toDoItem = new Label(" " + line);
                     // same code for adding a task lay out
                     CheckBox checkBox = new CheckBox();
                     HBox toDo = new HBox();
-                    Label toDoItem = new Label(" " + line);
                     toDoItem.setStyle("-fx-font-size: 13");
                     checkBox.setMaxSize(12, 13);
 
@@ -143,6 +153,7 @@ public class App extends Application{
             return;
         }
     }
+    // saving tasks to text file
     void saveFile() {
         try {
             PrintWriter fileWriter = new PrintWriter(new FileWriter("list.txt", false));
