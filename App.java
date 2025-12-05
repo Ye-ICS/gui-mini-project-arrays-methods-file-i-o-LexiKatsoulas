@@ -28,6 +28,8 @@ public class App extends Application{
     Text numTasksText;
     ToggleButton priorityBtn;
     Label toDoItem;
+    Label titleLabel;
+    TextField titleTextField;
     public static void main(String[] args) {
         launch(args);
     }
@@ -49,7 +51,7 @@ public class App extends Application{
 
         Label welcome = new Label();
         welcome.setText("Welcome to the To-Do List!");
-        welcome.setStyle("-fx-font-size: 20");
+        welcome.setStyle("-fx-font-size: 18");
         Label label = new Label();
         label.setText("Please enter your tasks: ");
 
@@ -61,9 +63,15 @@ public class App extends Application{
         Button saveBtn = new Button("Save list to file");
         numTasksText = new Text();
         priorityBtn = new ToggleButton("High Priority");
+        Label titeEnterLabel = new Label("Enter list name: ");
+        titleTextField = new TextField();
+        titleTextField.setPromptText("type here");
+        titleTextField.setMaxWidth(200);
+        titleLabel = new Label("Title Goes Here.");
+        titleLabel.setStyle("-fx-font-weight: bold");
 
         // organize compents
-        introBox.getChildren().addAll(welcome, label, tasksTextBox, priorityBtn);
+        introBox.getChildren().addAll(welcome, titeEnterLabel, titleTextField, titleLabel, label, tasksTextBox, priorityBtn);
         buttonBox.getChildren().addAll(clearTasksBtn, fileBtn, saveBtn);
         contentBox.getChildren().addAll();
         presetBox.getChildren().addAll(introBox, contentBox, buttonBox, numTasksText);
@@ -73,6 +81,7 @@ public class App extends Application{
         clearTasksBtn.setOnAction(event -> clear());
         fileBtn.setOnAction(event -> importFile());
         saveBtn.setOnAction(event -> saveFile());
+        titleTextField.setOnAction(event -> listTitle());
 
         // set scene and display stage
         Scene scene = new Scene(presetBox, 400, 300);
@@ -167,5 +176,12 @@ public class App extends Application{
             return;
         }
     
+    }
+    // adding a title
+    void listTitle() {
+        String title = titleTextField.getText();
+        titleTextField.clear();
+        titleLabel.setText(title);
+        titleLabel.setStyle("-fx-font-size: 20; -fx-font-weight: bold");
     }
 }
