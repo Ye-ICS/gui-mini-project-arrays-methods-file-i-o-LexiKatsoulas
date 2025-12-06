@@ -23,6 +23,7 @@ import java.io.FileWriter;
 public class App extends Application{
     VBox contentBox;
     HBox buttonBox;
+    VBox introBox;
     TextField tasksTextBox;
     Text fileText;
     ArrayList<String> numTasks = new ArrayList<>();
@@ -31,6 +32,7 @@ public class App extends Application{
     Label toDoItem;
     Label titleLabel;
     TextField titleTextField;
+    Label titeEnterLabel;
     public static void main(String[] args) {
         launch(args);
     }
@@ -42,7 +44,7 @@ public class App extends Application{
         presetBox.setStyle("-fx-border-color: black; -fx-border-width: 2");
         presetBox.setAlignment(Pos.TOP_CENTER);
         
-        VBox introBox = new VBox();
+        introBox = new VBox();
         introBox.setAlignment(Pos.TOP_CENTER);
 
         // has the content of the lists
@@ -64,18 +66,19 @@ public class App extends Application{
         Button saveBtn = new Button("Save list to file");
         numTasksText = new Text();
         priorityBtn = new ToggleButton("High Priority");
-        Label titeEnterLabel = new Label("Enter list name: ");
+        titeEnterLabel = new Label("Enter list name: ");
         titleTextField = new TextField();
         titleTextField.setPromptText("type here");
         titleTextField.setMaxWidth(200);
         titleLabel = new Label("Title Goes Here.");
         titleLabel.setStyle("-fx-font-weight: bold");
+        Button newListBtn = new Button("Add new list");
 
         // organize compents
         introBox.getChildren().addAll(welcome, titeEnterLabel, titleTextField, titleLabel, label, tasksTextBox, priorityBtn);
         buttonBox.getChildren().addAll(clearTasksBtn, fileBtn, saveBtn);
         contentBox.getChildren().addAll();
-        presetBox.getChildren().addAll(introBox, contentBox, buttonBox, numTasksText);
+        presetBox.getChildren().addAll(introBox, contentBox, buttonBox, newListBtn, numTasksText);
 
         // Reactions 
         tasksTextBox.setOnAction(event -> addTask());
@@ -83,6 +86,7 @@ public class App extends Application{
         fileBtn.setOnAction(event -> importFile());
         saveBtn.setOnAction(event -> saveFile());
         titleTextField.setOnAction(event -> listTitle());
+        newListBtn.setOnAction(event -> newList());
 
         // set scene and display stage
         Scene scene = new Scene(presetBox, 400, 300);
@@ -195,8 +199,22 @@ public class App extends Application{
     // adding a title
     void listTitle() {
         String title = titleTextField.getText();
-        titleTextField.clear();
+        introBox.getChildren().removeAll(titeEnterLabel, titleTextField);
         titleLabel.setText(title);
         titleLabel.setStyle("-fx-font-size: 20; -fx-font-weight: bold");
+    }
+    void newList() {
+        // clear current tasks and array list
+        clear();
+        // reset title field so user enter new list name
+        titleTextField.clear();
+        titleLabel.setText("Title Goes Here.");
+        titleLabel.setStyle("-fx-font-weight: bold");
+
+        // readd the textfield and label to allow user to readd title name
+        if (!introBox.getChildren().contains(titeEnterLabel)) {
+            introBox.getChildren().add(1, titeEnterLabel);
+            introBox.getChildren().add(2, titleTextField);
+        }
     }
 }
