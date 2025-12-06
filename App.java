@@ -11,6 +11,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import java.io.File;
 import javafx.scene.text.Text;
@@ -103,7 +104,7 @@ public class App extends Application{
         }
         numTasks.add(taskText);
         // updating number of tasks
-        numTasksText.setText(numTasks.size() + " task(s) left");
+        numTasksText.setText(numTasks.size() + " task(s) remaining");
         // making to do lay out
         CheckBox checkBox = new CheckBox();
         HBox toDo = new HBox();
@@ -117,7 +118,7 @@ public class App extends Application{
             toDo.setDisable(true);
             // remove from array list
             numTasks.remove(taskText);
-            numTasksText.setText(numTasks.size() + " task(s) left");
+            numTasksText.setText(numTasks.size() + " task(s) remaining");
         });
         toDo.getChildren().addAll(checkBox, toDoItem);
         contentBox.getChildren().add(toDo);
@@ -127,11 +128,19 @@ public class App extends Application{
         contentBox.getChildren().clear();
         // clears arraylist
         numTasks.clear();
-        numTasksText.setText(numTasks.size() + " task(s) left");
+        numTasksText.setText(numTasks.size() + " task(s) remaining");
     }
     // importing tasks from file ("list.txt")
     void importFile() {
-        File file = new File("list.txt");
+        // choose file
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select File");
+        File file = fileChooser.showOpenDialog(null);  
+        // if no file is selected      
+        if (file == null) {
+            return;
+        }
+
         try (Scanner scanner = new Scanner(file)) {
             // 'repeat' until scanner doesn't have a next line
             while (scanner.hasNextLine()) {
@@ -149,7 +158,7 @@ public class App extends Application{
                     checkBox.setOnAction(checkboxEvent -> {
                         toDo.setDisable(true);
                         numTasks.remove(line);
-                        numTasksText.setText(numTasks.size() + " task(s) left");
+                        numTasksText.setText(numTasks.size() + " task(s) remaining");
                     });
 
                     toDo.getChildren().addAll(checkBox, toDoItem);
@@ -157,25 +166,31 @@ public class App extends Application{
                 }
             }
         // update number of tasks after import
-        numTasksText.setText(numTasks.size() + " task(s) left");
+        numTasksText.setText(numTasks.size() + " task(s) remaining");
         } catch (FileNotFoundException e) {
             return;
         }
     }
     // saving tasks to text file
     void saveFile() {
+        // choose file
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save Task List");
+        File file = fileChooser.showSaveDialog(null);
+        // if no file is selected
+        if (file == null) {
+            return;
+        }
         try {
-            PrintWriter fileWriter = new PrintWriter(new FileWriter("list.txt", false));
+            PrintWriter fileWriter = new PrintWriter(new FileWriter(file, false));
             // repeat for the number of tasks added
             for (int i = 0; i < numTasks.size(); i++) {
                 fileWriter.println(numTasks.get(i));
             }
-
             fileWriter.close();
         } catch (Exception e) {
             return;
         }
-    
     }
     // adding a title
     void listTitle() {
