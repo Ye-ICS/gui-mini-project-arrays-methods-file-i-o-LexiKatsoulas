@@ -17,6 +17,7 @@ import java.io.File;
 import javafx.scene.text.Text;
 import java.io.PrintWriter;
 import java.io.FileWriter;
+import java.io.IOException;
 /**
  * Template JavaFX application.
  */
@@ -162,7 +163,7 @@ public class App extends Application{
                 }
             }
         } catch (FileNotFoundException e) {
-            return;
+            System.out.println("Fail to read.");
         }
     }
     // saving tasks to text file
@@ -187,13 +188,12 @@ public class App extends Application{
         }
         try {
             PrintWriter fileWriter = new PrintWriter(new FileWriter(file, false));
-            // repeat for the number of tasks added
             for (int i = 0; i < tasks.size(); i++) {
                 fileWriter.println(tasks.get(i));
             }
             fileWriter.close();
-        } catch (Exception e) {
-            return;
+        } catch (IOException ioe) {
+            System.out.println("Fail to save.");
         }
     }
     // adding a title
