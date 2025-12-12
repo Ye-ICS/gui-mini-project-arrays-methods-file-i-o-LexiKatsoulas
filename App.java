@@ -26,7 +26,7 @@ public class App extends Application{
     VBox introBox;
     TextField tasksTextBox;
     Text fileText;
-    ArrayList<String> numTasks = new ArrayList<String>();
+    ArrayList<String> tasks = new ArrayList<String>();
     Text numTasksText;
     ToggleButton priorityBtn;
     Label toDoItem;
@@ -64,7 +64,7 @@ public class App extends Application{
         Button clearTasksBtn = new Button("Clear Tasks");
         Button fileBtn = new Button("Import list from file");
         Button saveBtn = new Button("Save list to file");
-        numTasksText = new Text(numTasks.size() + " task(s) remaining");
+        numTasksText = new Text(tasks.size() + " task(s) remaining");
         priorityBtn = new ToggleButton("High Priority");
         titeEnterLabel = new Label("Enter list name: ");
         titleTextField = new TextField();
@@ -106,14 +106,14 @@ public class App extends Application{
         } else {
             taskText = input;
         }
-        numTasks.add(taskText);
-        // updating number of tasks
-        numTasksText.setText(numTasks.size() + " task(s) remaining");
+        addTask(taskText);
+    }
+    void addTask(String task) {
         // making to do lay out
         CheckBox checkBox = new CheckBox();
         HBox toDo = new HBox();
         
-        toDoItem = new Label(" " + taskText);
+        toDoItem = new Label(" " + task);
         toDoItem.setStyle("-fx-font-size: 13");
         checkBox.setMaxSize(12, 13);
 
@@ -121,20 +121,27 @@ public class App extends Application{
         checkBox.setOnAction(checkboxEvent -> {
             toDo.setDisable(true);
             // remove from array list
-            numTasks.remove(taskText);
-            numTasksText.setText(numTasks.size() + " task(s) remaining");
+            tasks.remove(task);
+            numTasksText.setText(tasks.size() + " task(s) remaining");
         });
         toDo.getChildren().addAll(checkBox, toDoItem);
         contentBox.getChildren().add(toDo);
+        tasks.add(task);
+        // updating number of tasks
+        numTasksText.setText(tasks.size() + " task(s) remaining");
     }
+
     // clearing all tasks
     void clear() {
         contentBox.getChildren().clear();
         // clears arraylist
-        numTasks.clear();
-        numTasksText.setText(numTasks.size() + " task(s) remaining");
+        tasks.clear();
+        numTasksText.setText(tasks.size() + " task(s) remaining");
     }
-    // importing tasks from file ("list.txt")
+    
+    /**
+     * Importing tasks from file ("list.txt")
+     */
     void importFile() {
         // choose file
         FileChooser fileChooser = new FileChooser();
@@ -151,26 +158,9 @@ public class App extends Application{
                 String line = scanner.nextLine().trim();
                 if (!line.isEmpty()) {
                     // Add to numTasks so it gets saved to file as well
-                    numTasks.add(line);
-                    toDoItem = new Label(" " + line);
-                    // same code for adding a task lay out
-                    CheckBox checkBox = new CheckBox();
-                    HBox toDo = new HBox();
-                    toDoItem.setStyle("-fx-font-size: 13");
-                    checkBox.setMaxSize(12, 13);
-
-                    checkBox.setOnAction(checkboxEvent -> {
-                        toDo.setDisable(true);
-                        numTasks.remove(line);
-                        numTasksText.setText(numTasks.size() + " task(s) remaining");
-                    });
-
-                    toDo.getChildren().addAll(checkBox, toDoItem);
-                    contentBox.getChildren().add(toDo);
+                    addTask(line);
                 }
             }
-        // update number of tasks after import
-        numTasksText.setText(numTasks.size() + " task(s) remaining");
         } catch (FileNotFoundException e) {
             return;
         }
@@ -198,8 +188,8 @@ public class App extends Application{
         try {
             PrintWriter fileWriter = new PrintWriter(new FileWriter(file, false));
             // repeat for the number of tasks added
-            for (int i = 0; i < numTasks.size(); i++) {
-                fileWriter.println(numTasks.get(i));
+            for (int i = 0; i < tasks.size(); i++) {
+                fileWriter.println(tasks.get(i));
             }
             fileWriter.close();
         } catch (Exception e) {
