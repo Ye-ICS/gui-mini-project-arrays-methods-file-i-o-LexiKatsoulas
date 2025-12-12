@@ -26,7 +26,7 @@ public class App extends Application{
     VBox introBox;
     TextField tasksTextBox;
     Text fileText;
-    ArrayList<String> numTasks = new ArrayList<>();
+    ArrayList<String> numTasks = new ArrayList<String>();
     Text numTasksText;
     ToggleButton priorityBtn;
     Label toDoItem;
@@ -64,7 +64,7 @@ public class App extends Application{
         Button clearTasksBtn = new Button("Clear Tasks");
         Button fileBtn = new Button("Import list from file");
         Button saveBtn = new Button("Save list to file");
-        numTasksText = new Text();
+        numTasksText = new Text(numTasks.size() + " task(s) remaining");
         priorityBtn = new ToggleButton("High Priority");
         titeEnterLabel = new Label("Enter list name: ");
         titleTextField = new TextField();
@@ -180,6 +180,16 @@ public class App extends Application{
         // choose file
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save Task List");
+
+        // if there is a title, change file name to that
+        String title = titleLabel.getText();
+        if (!title.equals("Title Goes Here.")){
+            fileChooser.setInitialFileName(title + ".txt");
+        } else {
+            // set the list.txt file as default
+            fileChooser.setInitialFileName("list.txt");
+        }
+       
         File file = fileChooser.showSaveDialog(null);
         // if no file is selected
         if (file == null) {
